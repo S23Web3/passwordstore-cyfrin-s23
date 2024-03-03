@@ -30,4 +30,16 @@ contract PasswordStoreTest is Test {
         vm.expectRevert(PasswordStore.PasswordStore__NotOwner.selector);
         passwordStore.getPassword();
     }
+
+    function test_non_owner_can_set_password(address randomAddress) public {
+        vm.assume(randomAddress != owner); //exclude the owner from the random generated addressess
+        vm.prank(randomAddress); // act as the randomAddress
+        string memory newPassword = "proof anyone can set a password"; //set a new password
+        passwordStore.setPassword(newPassword); //run the function with the newPassword as parameter
+        //some random Address set the password
+
+        vm.prank(owner); // be the owner in the next line to retrieve the password
+        string memory actualPassword = passwordStore.getPassword();
+        assertEq(newPassword, actualPassword); //check that the set password by the randomAddress is the one that the owner retrieves
+    }
 }
